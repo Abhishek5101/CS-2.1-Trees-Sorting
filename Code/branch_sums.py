@@ -22,3 +22,18 @@ def calculateBranchSums(node, runningSum, sums):
 	
 	calculateBranchSums(node.left, runningSum, sums)
 	calculateBranchSums(node.right, runningSum, sums)
+
+
+def is_palindrome(s):
+	print(s[1:len(s)-1])
+	return is_palindrome(s[1:len(s)-1])
+
+
+# is_palindrome("nayan")
+
+def ispalindrome(word):
+    if len(word) < 2: return True
+    if word[0] != word[-1]: return False
+    return ispalindrome(word[1:-1])
+
+ispalindrome("nayan")
