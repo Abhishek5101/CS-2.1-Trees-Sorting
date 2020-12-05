@@ -35,15 +35,40 @@ class PrefixTree:
 
     def is_empty(self):
         """Return True if this prefix tree is empty (contains no strings)."""
-        # TODO
+        return self.size == 0
 
     def contains(self, string):
         """Return True if this prefix tree contains the given string."""
-        # TODO
+        current = self.root
+        for char in string:
+            if current.has_child(char):
+                child = current.get_child(char)
+                current = child
+            else:
+                return current.is_terminal()
+        # if the final node that we get to is terminal
+        return current.is_terminal()
+
 
     def insert(self, string):
         """Insert the given string into this prefix tree."""
-        # TODO
+        current = self.root
+        for char in string:
+            # Search for the child
+            if current.has_child(char):
+                # found it so just traverse to next node
+                current = current.get_child(char)
+            else:
+                # create new node and add it
+                new_node = PrefixTreeNode(char)
+                current.add_child(char, new_node)
+                # traverse to next node
+                current = new_node
+        # set node to terminal and increment word count if the node is not already terminal
+        if not current.is_terminal():
+            self.size += 1
+            current.terminal = True
+
 
     def _find_node(self, string):
         """Return a pair containing the deepest node in this prefix tree that
@@ -55,26 +80,52 @@ class PrefixTree:
             return self.root, 0
         # Start with the root node
         node = self.root
-        # TODO
+        depth = 0
+        # loop through letters of string
+        while depth < len(string) and node.has_child(string[depth]):
+            node = node.get_child(string[depth])
+            depth += 1
+        return node, depth
+
 
     def complete(self, prefix):
         """Return a list of all strings stored in this prefix tree that start
         with the given prefix string."""
         # Create a list of completions in prefix tree
         completions = []
-        # TODO
+        # return all items if empty string
+        if prefix == '':
+            return self.strings()
+        # traverse to base where all options will be from
+        node = self._find_node(prefix)
+        # if node is empty, no completions
+        if node[0].character != '':
+            self._traverse(node[0], prefix, completions.append)
+        # return all the options
+        return completions
+
 
     def strings(self):
         """Return a list of all strings stored in this prefix tree."""
         # Create a list of all strings in prefix tree
         all_strings = []
-        # TODO
+        # add all the strings using our traverse
+        self._traverse(self.root, '', all_strings.append)
+        # return all combos
+        return all_strings
+
 
     def _traverse(self, node, prefix, visit):
         """Traverse this prefix tree with recursive depth-first traversal.
         Start at the given node with the given prefix representing its path in
         this prefix tree and visit each node with the given visit function."""
-        # TODO
+        # if we are at the end of a word, then visit it (append)
+        if node.is_terminal():
+            visit(prefix)
+        for char in node.children.keys():
+            # traverse to the next node and build string recursivly
+            child = node.get_child(char)
+            self._traverse(child, prefix + char, visit)
 
 
 def create_prefix_tree(strings):
